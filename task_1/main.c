@@ -4,8 +4,8 @@
 #include "timer.h"
 
 int thread_count;
-int trials_count;
-int trials_on_thread;
+long trials_count;
+long trials_on_thread;
 int* results;
 
 double randPoint(){
@@ -18,7 +18,7 @@ double randPoint(){
 
 void* routine(void* rank){
 	long my_rank = (long)rank;
-    for(int i = 0; i < trials_on_thread; i++){
+    for(long i = 0; i < trials_on_thread; i++){
         double x = randPoint();
         double y = randPoint();
         if(x * x + y * y < 1){
