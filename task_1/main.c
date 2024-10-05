@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "timer.h"
 
 int thread_count;
 int trials_count;
@@ -20,7 +21,6 @@ void* routine(void* rank){
     for(int i = 0; i < trials_on_thread; i++){
         double x = randPoint();
         double y = randPoint();
-        printf("%f, %f\n", x, y);
         if(x * x + y * y < 1){
             results[my_rank]++;
         }
@@ -35,11 +35,11 @@ int main(int argc, char const *argv[])
 	thread_count = strtol(argv[1], NULL, 10);
 	trials_count = strtol(argv[2], NULL, 10);
     trials_on_thread = trials_count/thread_count;
-
+	results = calloc(thread_count, sizeof(int));
 	pthread_t* threads = malloc(thread_count * sizeof(pthread_t));
 
-	results = calloc(thread_count, sizeof(int));
-
+    double start_time;
+    GET_TIME(start_time);
 	for(long i = 0; i < thread_count; i++){
 		pthread_create(&threads[i], NULL, routine, (void*)i);
 	}
@@ -49,6 +49,9 @@ int main(int argc, char const *argv[])
 		pthread_join(threads[i], NULL);
 	}
 
+    double end_time;
+    GET_TIME(end_time);
+
 	printf("Result\n");
     double pi = 0;
 	for (int i = 0; i < thread_count; ++i)
@@ -57,7 +60,7 @@ int main(int argc, char const *argv[])
 	}
     pi /= trials_count;
     pi *= 4;
-    printf("PI = %f", pi);
+    printf("PI = %f, time start: %f, end: %f, spent: %f", pi, start_time, end_time, (end_time - start_time));
 
 	free(threads);
 	free(results);
