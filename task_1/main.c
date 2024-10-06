@@ -4,8 +4,8 @@
 #include "timer.h"
 
 int thread_count;
-long trials_count;
-long trials_on_thread;
+unsigned long trials_count;
+unsigned long trials_on_thread;
 int* results;
 
 double randPoint(){
@@ -30,16 +30,17 @@ void* routine(void* rank){
 
 int main(int argc, char const *argv[])
 {
-	printf("Hello from main thread!\n");
-
 	thread_count = strtol(argv[1], NULL, 10);
 	trials_count = strtol(argv[2], NULL, 10);
     trials_on_thread = trials_count/thread_count;
 	results = calloc(thread_count, sizeof(int));
 	pthread_t* threads = malloc(thread_count * sizeof(pthread_t));
 
+    printf("Thread count: %d, tries count: %d!\n", thread_count, trials_count);
+
     double start_time;
     GET_TIME(start_time);
+    srand(NULL);
 	for(long i = 0; i < thread_count; i++){
 		pthread_create(&threads[i], NULL, routine, (void*)i);
 	}
@@ -54,11 +55,13 @@ int main(int argc, char const *argv[])
 
 	printf("Result\n");
     double pi = 0;
+    unsigned long match = 0;
 	for (int i = 0; i < thread_count; ++i)
 	{
-        pi += results[i];
+        match += results[i];
 	}
-    pi /= trials_count;
+    printf("%d\n", match);
+    pi = (double)match/(double)trials_count;
     pi *= 4;
     printf("PI = %f, time start: %f, end: %f, spent: %f", pi, start_time, end_time, (end_time - start_time));
 
