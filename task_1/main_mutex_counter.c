@@ -33,7 +33,6 @@ void* routine(void* rank){
 
 int main(int argc, char const *argv[])
 {
-	printf("Hello from main thread!\n");
 	thread_count = strtol(argv[1], NULL, 10);
 	trials_count = strtol(argv[2], NULL, 10);
     trials_on_thread = trials_count/thread_count;
