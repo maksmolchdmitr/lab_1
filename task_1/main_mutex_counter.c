@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
     printf("Thread count: %d, tries count: %d!\n", thread_count, trials_count);
 
     double start_time;
-    srand(NULL);
+    srand(0);
     GET_TIME(start_time);
 	for(long i = 0; i < thread_count; i++){
 		pthread_create(&threads[i], NULL, routine, (void*)i);

@@ -44,6 +44,7 @@ int main(int argc, char const *argv[])
 
     double start_time;
     GET_TIME(start_time);
+    srand(0);
 	for(long i = 0; i < thread_count; i++){
 		pthread_create(&threads[i], NULL, routine, (void*)i);
 	}
