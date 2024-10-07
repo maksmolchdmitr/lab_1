@@ -57,11 +57,15 @@ void* routine(void* rank){
         z.y = 0;
         char is_skip = 0;
 
-        printf("rank %d is workin\n", my_rank);
         for(long i=0; i<ITERATION_COUNT; i++){
+            if (cur_point_count >= point_count) {
+                return NULL;
+            }
+
             complex_square(&z);
             z.x += x;
             z.y += y;
+
             if (z.x * z.x + z.y * z.y > 4) {
                 is_skip = 1;
                 break;
@@ -69,9 +73,7 @@ void* routine(void* rank){
         }
         if (is_skip == 0) {
             pthread_mutex_lock(&mutex);
-            printf("rank: %d, cur_point: %d\n", my_rank, cur_point_count);
             if(cur_point_count >= point_count) {
-                printf("End rank: %d\n", my_rank);
                 pthread_mutex_unlock(&mutex);
                 return NULL;
             }
@@ -81,7 +83,6 @@ void* routine(void* rank){
             pthread_mutex_unlock(&mutex);
         }
     }
-    printf("End rank: %d\n", my_rank);
 	return NULL;
 }
 
@@ -97,6 +98,17 @@ void init_x_array() {
         x_cur += delta;
         x_right_bounds[i] = x_cur;
     }
+}
+
+void save_result_in_csv_file() {
+    FILE *file;
+    file = fopen("result.csv", "w+");
+    fprintf(file, "X, Y\n");
+    for(long i=0; i<point_count; i++) {
+        fprintf(file, "%f, %f\n", result[i].x, result[i].y);
+    }
+    fclose(file);
+    printf("Result saved in file 'result.csv'!\n");
 }
 
 int main(int argc, char const *argv[])
@@ -133,11 +145,10 @@ int main(int argc, char const *argv[])
     double end_time;
     GET_TIME(end_time);
 
-    for (size_t i = 0; i < point_count; i++)
-    {
-        printf("Result x=%f y=%f\n", result[i].x, result[i].y);
-    }
     printf("Time spent: %f", (end_time - start_time));
+    
+    save_result_in_csv_file();
+    
     free(result);
     free(x_right_bounds);
     pthread_mutex_destroy(&mutex);
