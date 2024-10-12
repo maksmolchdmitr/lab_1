@@ -31,6 +31,16 @@ int my_rwlock_destroy (my_rwlock* lock /*out*/){
 }
 
 int my_rwlock_rdlock (my_rwlock* lock /*in/out*/){
+    pthread_mutex_lock(&(lock->mutex));
+
+    while (lock->num_writers_waiting > 0 || lock->writer_active == 1)
+    {
+        pthread_cond_wait(&(lock->cond), &(lock->mutex));
+    }
+    lock->num_readers_active++;
+    
+    pthread_mutex_unlock(&(lock->mutex));
+
     return 0;
 }
 
