@@ -63,7 +63,7 @@ int my_rwlock_unlock (my_rwlock* lock /*in/out*/){
         lock->num_readers_active--;
     }
     lock->writer_active = 0;
-    pthread_cond_signal(&lock->cond);
+    pthread_cond_broadcast(&lock->cond);
     pthread_mutex_unlock(&lock->mutex);
     return 0;
 }
