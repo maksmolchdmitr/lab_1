@@ -127,12 +127,6 @@ int main(int argc, char const *argv[])
     double start_time;
     GET_TIME(start_time);
 
-    // printf("X array with size = %d :", x_count);
-    // for(int i=0; i<x_count; i++){
-    //     printf("%f ", x_right_bounds[i]);
-    // }
-    // printf("\n");
-
     for(long i = 0; i < thread_count; i++){
 		pthread_create(&threads[i], NULL, routine, (void*)i);
 	}
@@ -145,7 +139,7 @@ int main(int argc, char const *argv[])
     double end_time;
     GET_TIME(end_time);
 
-    printf("Time spent: %f", (end_time - start_time));
+    printf("Time spent: %f\n", (end_time - start_time));
     
     save_result_in_csv_file();
     
