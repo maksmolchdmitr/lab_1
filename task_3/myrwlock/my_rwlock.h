@@ -17,10 +17,10 @@ typedef struct my_rwlock
 
 
 
-int my_rwlock_init (my_rwlock* lock); // никита
-int my_rwlock_destroy (my_rwlock* lock /*out*/);  // макс
-int my_rwlock_rdlock (my_rwlock* lock /*in/out*/); //никита
-int my_rwlock_wrlock (my_rwlock* lock /*in/out*/); //макс
-int my_rwlock_unlock (my_rwlock* lock /*in/out*/);
+int my_rwlock_init (my_rwlock* lock);
+int my_rwlock_destroy (my_rwlock* lock); 
+int my_rwlock_rdlock (my_rwlock* lock);
+int my_rwlock_wrlock (my_rwlock* lock);
+int my_rwlock_unlock (my_rwlock* lock);
 
 #endif
