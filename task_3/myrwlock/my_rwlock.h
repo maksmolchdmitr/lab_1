@@ -11,7 +11,6 @@ typedef struct my_rwlock
     pthread_mutex_t mutex;
     pthread_cond_t cond;
     int num_readers_active;
-    int num_writers_waiting;
     char writer_active;
 } my_rwlock;
 
