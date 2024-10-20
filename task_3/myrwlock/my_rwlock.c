@@ -1,7 +1,6 @@
 #include "my_rwlock.h"
 
 int my_rwlock_init (my_rwlock* lock) {
-    lock = malloc(sizeof(my_rwlock));
     if (pthread_cond_init(&(lock->read_cond), NULL) != 0) {
         return -1;
     }
@@ -34,8 +33,6 @@ int my_rwlock_destroy (my_rwlock* lock /*out*/){
         return -1;
     }
     
-    free(lock);
-
     return 0;
 }
 
