@@ -38,15 +38,11 @@ int my_rwlock_destroy (my_rwlock* lock /*out*/){
 int my_rwlock_rdlock (my_rwlock* lock /*in/out*/){
     pthread_mutex_lock(&(lock->mutex));
 
-    printf("READ WAIT. writer=%d, readers=%d, writers_waiting=%d\n", lock->writer_active, lock->num_readers_active, lock->num_writers_waiting);
-
     while (lock->writer_active == 1)
     {
         pthread_cond_wait(&(lock->read_cond), &(lock->mutex));
     }
     lock->num_readers_active++;
-
-    printf("READ. writer=%d, readers=%d, writers_waiting=%d\n", lock->writer_active, lock->num_readers_active, lock->num_writers_waiting);
 
     pthread_mutex_unlock(&(lock->mutex));
 
@@ -57,14 +53,12 @@ int my_rwlock_wrlock (my_rwlock* lock /*in/out*/){
     pthread_mutex_lock(&lock->mutex);
     
     lock->num_writers_waiting++;
-    printf("WRITE WAIT. writer=%d, readers=%d, writers_waiting=%d\n", lock->writer_active, lock->num_readers_active, lock->num_writers_waiting);
     while (lock->num_readers_active > 0 || lock->writer_active==1){
         pthread_cond_wait(&lock->write_cond, &lock->mutex);
     }
     lock->num_writers_waiting--;
     lock->writer_active = 1;
 
-    printf("WRITE. writer=%d, readers=%d, writers_waiting=%d\n", lock->writer_active, lock->num_readers_active, lock->num_writers_waiting);
     pthread_mutex_unlock(&lock->mutex);
     return 0;
 }
@@ -77,12 +71,13 @@ int my_rwlock_unlock (my_rwlock* lock /*in/out*/){
     
     if (lock->writer_active == 1) {
         lock->writer_active = 0;
-        printf("UNLOCK WRITER. writer=%d, readers=%d, writers_waiting=%d\n", lock->writer_active, lock->num_readers_active, lock->num_writers_waiting);
-        pthread_cond_signal(&lock->write_cond);
-        pthread_cond_broadcast(&lock->read_cond);
+        if (lock->num_writers_waiting > 0) {
+            pthread_cond_signal(&lock->write_cond);
+        } else {
+            pthread_cond_broadcast(&lock->read_cond);
+        }
     }
     else if (lock->num_readers_active == 0) {
-        printf("UNLOCK. writer=%d, readers=%d, writers_waiting=%d\n", lock->writer_active, lock->num_readers_active, lock->num_writers_waiting);
         pthread_cond_signal(&lock->write_cond);
         if (lock->num_writers_waiting == 0) {
             pthread_cond_broadcast(&lock->read_cond);

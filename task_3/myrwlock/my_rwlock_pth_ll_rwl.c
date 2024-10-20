@@ -5,9 +5,6 @@
 #include "timer.h"
 #include "my_rwlock.h"
 
-#define DEBUG 1
-#define OUTPUT 1
-
 /* Random ints are less than MAX_KEY */
 const int MAX_KEY = 100000000;
 
@@ -269,7 +266,6 @@ void* Thread_work(void* rank) {
    for (i = 0; i < ops_per_thread; i++) {
       which_op = my_drand(&seed);
       val = my_rand(&seed) % MAX_KEY;
-      printf("which_op = %f\n", which_op);
       if (which_op < search_percent) {
          my_rwlock_rdlock(&rwlock);
          Member(val);
@@ -277,13 +273,11 @@ void* Thread_work(void* rank) {
          my_member_count++;
       } else if (which_op < search_percent + insert_percent) {
          my_rwlock_wrlock(&rwlock);
-         printf("insert\n");
          Insert(val);
          my_rwlock_unlock(&rwlock);
          my_insert_count++;
       } else { /* delete */
          my_rwlock_wrlock(&rwlock);
-         printf("delete\n");
          Delete(val);
          my_rwlock_unlock(&rwlock);
          my_delete_count++;
@@ -296,6 +290,5 @@ void* Thread_work(void* rank) {
    delete_count += my_delete_count;
    pthread_mutex_unlock(&count_mutex);
 
-   printf("end rank = %ld\n", my_rank);
    return NULL;
 }  /* Thread_work */
